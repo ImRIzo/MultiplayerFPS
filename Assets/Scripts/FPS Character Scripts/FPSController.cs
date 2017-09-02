@@ -32,11 +32,67 @@ public class FPSController : MonoBehaviour {
 
 
 	void Start () {
-		
+        firsPerson_View = transform.Find("FPS View").transform;
+        charController = GetComponent<CharacterController>();
+        speed = walkSpeed;
+        is_moving = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+        PlayerMovement();
 	}
+
+    void PlayerMovement()
+    {
+        if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)){
+            if (Input.GetKey(KeyCode.W))
+            {
+                inputY_Set = 1f;
+            }
+            else
+            {
+                inputY_Set = -1f;
+            }
+        }
+        else
+        {
+            inputY_Set = 0f;
+        }
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        {
+            if (Input.GetKey(KeyCode.A))
+            {
+                inputX_Set = -1f;
+            }
+            else
+            {
+                inputX_Set = 1f;
+            }
+        }
+        else
+        {
+            inputX_Set = 0f;
+        }
+
+        inputY = Mathf.Lerp(inputY, inputY_Set, Time.deltaTime * 19f);
+        inputX = Mathf.Lerp(inputX, inputX_Set, Time.deltaTime * 19f);
+
+        inputModifyFactor = Mathf.Lerp(inputModifyFactor,(inputY_Set != 0 && inputX_Set != 0 && limitDiagonalSpeed) ? 0.75f : 1.0f, Time.deltaTime * 19f);
+
+        firstPerson_View_Rotation = Vector3.Lerp(firstPerson_View_Rotation, Vector3.zero, Time.deltaTime * 5f);
+        firsPerson_View.localEulerAngles = firstPerson_View_Rotation;
+
+        if (is_Grounded)
+        {
+            moveDirection = new Vector3(inputX * inputModifyFactor, - antiBumpFactor, inputY * inputModifyFactor);
+            moveDirection = transform.TransformDirection(moveDirection) * speed;
+        }
+
+        moveDirection.y -= gravity * Time.deltaTime;
+
+        is_Grounded = (charController.Move(moveDirection * Time.deltaTime) & CollisionFlags.Below) != 0;
+        is_moving = charController.velocity.magnitude > 0.15f;
+    }
 }
