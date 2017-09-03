@@ -30,16 +30,6 @@ public class FPSMouseLook : MonoBehaviour {
         originalRotaion = transform.rotation;
 	}
 	
-    void Update()
-    {
-
-    }
-
-    void FixedUpdate()
-    {
-
-    }
-
 	void LateUpdate () {
         HandleRotation();
     }
